@@ -1,2 +1,4 @@
 # PowerShell Log File Monitoring
-A repository of examples of PowerShell utilisation for log file monitoring.
+
+This repository contains my PowerShell scripts for log file monitoring. It showcases my development skills and is intended to demonstrate my abilities for employment opportunities.
+
