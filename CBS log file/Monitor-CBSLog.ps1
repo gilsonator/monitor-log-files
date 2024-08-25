@@ -70,7 +70,7 @@ try {
 
         # Adding match for hresultmsg:
         # Note: Using one Regex pattern gives better performace, one pass, but harder to read.
-        # if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+?)( \[HRESULT = (?<hresult>0x[0-9A-Fa-f]+) - (?<hresultmsg>[A-Za-z_]+)\])?$') {
+        # if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+?)( \[HRESULT = (?<hresult>0x[0-9A-Fa-f]+)( - (?<hresultmsg>[A-Za-z_]+)\]))?$') {
         #
         # Otherwise can be split into two passes, slight performance impact, but easier to read and debug:
         if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+?)?$') {
