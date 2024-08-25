@@ -67,13 +67,21 @@ try {
         $line = $_
 
         $lineCount++
-        
-        if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+)$') {
+
+        # Adding match for hresultmsg:
+        # if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+?)( \[HRESULT = (?<hresult>0x[0-9A-Fa-f]+) - (?<hresultmsg>[A-Za-z_]+)\])?$') {
+        # Note: Using one Regex pattern gives better performace, one pass, but harder to read.
+        # Otherwise can be split into two passes, slight performance impact, but easier to read and debug:
+        if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+?)?$') {
             $date = $matches['date']
             $time = $matches['time']
             $level = $matches['level'].Trim()
             $component = $matches['component'].Trim()
             $message = $matches['message'].Trim()
+
+            # Combined:
+            # $hresult = $matches['hresult']
+            # $hresultmsg = $matches['hresultmsg']
 
             if ($LogLevel -eq "All" -or $LogLevel -eq $level) {
                 # Set color based on log level
@@ -87,6 +95,14 @@ try {
                 Write-Host "[$level] >` " -NoNewline -ForegroundColor $color
                 Write-Host "$component`: " -NoNewline -ForegroundColor Magenta
                 Write-Host "$message"
+
+                # Split second pass of message
+                if ($message -match '\[HRESULT = (?<hresult>0x[0-9A-Fa-f]+) - (?<hresultmsg>[A-Za-z_]+)\]$') {
+                    $hresult = $matches['hresult']
+                    $hresultmsg = $matches['hresultmsg']
+            
+                    Write-Host "$hresult - $hresultmsg" -ForegroundColor DarkMagenta
+                }
             }
         } else {
             # Show line for debugging
