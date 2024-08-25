@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell: Launch Script",
+            "script": "${workspaceFolder}/${relativeFile}",
+            "args": [
+                // "-FileName", "C:\\Path\\To\\LogFile.log",
+                //"-TailLines", "20",
+                //"-Delay", "2",
+                //"-LogLevel", "Error"
+            ]
+        }
+    ]
+}
