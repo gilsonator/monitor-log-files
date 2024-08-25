@@ -54,33 +54,29 @@ while (-Not (Test-Path $FileName)) {
 }
 
 # Once the file is found, start monitoring it
-while ($true) {
-    Clear-Host
-    $lines = Get-Content $FileName -Tail $TailLines
-    foreach ($line in $lines) {
-        if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+)$') {
-            $date = $matches['date']
-            $time = $matches['time']
-            $level = $matches['level'].Trim()
-            $component = $matches['component'].Trim()
-            $message = $matches['message'].Trim()
+Get-Content $FileName -Wait -Tail $TailLines | ForEach-Object {
+    $line = $_
+    if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+)$') {
+        $date = $matches['date']
+        $time = $matches['time']
+        $level = $matches['level'].Trim()
+        $component = $matches['component'].Trim()
+        $message = $matches['message'].Trim()
 
-            if ($LogLevel -eq "All" -or $LogLevel -eq $level) {
-                # Set color based on log level
-                switch ($level) {
-                    "Error" { $color = "DarkRed" }
-                    "Warning" { $color = "Yellow" }
-                    "Info" { $color = "Green" }
-                    default { $color = "White" }
-                }
-                Write-Host "$date $time`t" -NoNewline -ForegroundColor DarkGreen
-                Write-Host "[$level] > `t" -NoNewline -ForegroundColor $color
-                Write-Host "$component`t" -NoNewline -ForegroundColor Magenta
-                Write-Host "$message"
+        if ($LogLevel -eq "All" -or $LogLevel -eq $level) {
+            # Set color based on log level
+            switch ($level) {
+                "Error" { $color = "DarkRed" }
+                "Warning" { $color = "Yellow" }
+                "Info" { $color = "Green" }
+                default { $color = "White" }
             }
-        } else {
-             # Write-Host $line.Trim()
+            Write-Host "$date $time`t" -NoNewline -ForegroundColor DarkGreen
+            Write-Host "[$level] > `t" -NoNewline -ForegroundColor $color
+            Write-Host "$component`t" -NoNewline -ForegroundColor Magenta
+            Write-Host "$message"
         }
+    } else {
+        # Write-Host $line.Trim()
     }
-    Start-Sleep -Seconds $Delay
 }
