@@ -7,6 +7,8 @@
     It is similar to the Linux 'tail -F' command.
 
     By David Gilson
+    
+    I created this to help diagnose issues I encountered while updating Windows 11.
 
     The Core componentization services include the following:
     CBS (Component Based Servicing)
