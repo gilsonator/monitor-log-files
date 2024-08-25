@@ -1,0 +1,86 @@
+2024-08-24 14:09:31, Info                  CBS    TI: --- Initializing Trusted Installer ---
+2024-08-24 14:09:31, Info                  CBS    TI: Last boot time: 2024-08-24 13:30:55.500
+2024-08-24 14:09:31, Info                  CBS    TrustedInstaller terminated with pending operations.
+2024-08-24 14:09:31, Info                  CBS    Starting TrustedInstaller initialization.
+2024-08-24 14:09:31, Info                  CBS    Lock: New lock added: CCbsPublicSessionClassFactory, level: 30, total lock:4
+2024-08-24 14:09:31, Info                  CBS    Lock: New lock added: CCbsPublicSessionClassFactory, level: 30, total lock:5
+2024-08-24 14:09:31, Info                  CBS    Lock: New lock added: WinlogonNotifyLock, level: 8, total lock:6
+2024-08-24 14:09:31, Info                  CBS    Ending TrustedInstaller initialization.
+2024-08-24 14:09:31, Info                  CBS    Starting the TrustedInstaller main loop.
+2024-08-24 14:09:31, Info                  CBS    TrustedInstaller service starts successfully.
+2024-08-24 14:09:31, Info                  CBS    Winlogon: Registering for CreateSession notifications
+2024-08-24 14:09:31, Info                  CBS    Winlogon: Loading SysNotify DLL
+2024-08-24 14:09:31, Info                  CBS    Winlogon: Starting notify server 
+2024-08-24 14:09:31, Info                  CBS    TI: started and RebootPending volatile key indicates that a reboot is pending, skip startup processing.
+2024-08-24 14:09:31, Info                  CBS    TI: Startup Processing completes, release startup processing lock.
+2024-08-24 14:09:31, Info                  CBS    Trusted Installer signaled for shutdown, going to exit.
+2024-08-24 14:09:31, Info                  CBS    Trusted Installer is shutting down because: SHUTDOWN_REASON_NOTIFICATION:PRESHUTDOWN
+2024-08-24 14:09:31, Info                  CBS    Starting shutdown processing in TrustedInstaller service.
+2024-08-24 14:09:31, Info                  CBS    Starting TiWorker initialization.
+2024-08-24 14:09:31, Info                  CBS    Lock: New lock added: TiWorkerClassFactory, level: 30, total lock:2
+2024-08-24 14:09:31, Info                  CBS    Ending TiWorker initialization.
+2024-08-24 14:09:31, Info                  CBS    Starting the TiWorker main loop.
+2024-08-24 14:09:31, Info                  CBS    TiWorker starts successfully.
+2024-08-24 14:09:31, Info                  CBS    Lock: New lock added: CCbsWorker, level: 5, total lock:3
+2024-08-24 14:09:31, Info                  CBS    Universal Time is: 2024-08-24 04:09:31.985
+2024-08-24 14:09:31, Info                  CBS    Loaded Servicing Stack v10.0.22621.4075 with Core: C:\WINDOWS\winsxs\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.22621.4075_none_e976f31642bb08be\cbscore.dll
+2024-08-24 14:09:31, Info                  CBS    Build: 22621.1.amd64fre.ni_release.220506-1250
+2024-08-24 14:09:31, Info                  CSI    00000001@2024/8/24:04:09:31.985 WcpInitialize: wcp.dll version 10.0.22621.4075 (WinBuild.160101.0800)
+2024-08-24 14:09:32, Info                  CBS    TurboContainer load Successful
+2024-08-24 14:09:32, Info                  CBS    Lock: New lock added: CCbsSessionManager, level: 11, total lock:9
+2024-08-24 14:09:32, Info                  CBS    Lock: New lock added: CSIInventoryCriticalSection, level: 64, total lock:10
+2024-08-24 14:09:32, Info                  CBS    Shtd: Begin shutdown processing.
+2024-08-24 14:09:32, Info                  CBS    Setting ServicingInProgress flag to 2
+2024-08-24 14:09:32, Info                  CBS    Shtd: Prepare for shutdown processing.
+2024-08-24 14:09:32, Info                  CBS    SetProgressMessage: progressMessageStage: 0, ExecuteState: ExecuteStateNone, SubStage: 0
+2024-08-24 14:09:32, Info                  CBS    Shtd: PreshutdownTimeout: 3600000ms, BlockTimeIncrement: 900000ms
+2024-08-24 14:09:32, Info                  CBS    Shtd: progress thread started
+2024-08-24 14:09:32, Info                  CBS    Setting reboot in progress flag
+2024-08-24 14:09:32, Info                  CBS    Shtd: Waiting for any outstanding sessions to complete
+2024-08-24 14:09:32, Info                  CBS    Shtd: Executing any smart pended operations.
+2024-08-24 14:09:32, Info                  CBS    Failed to open package file: \\?\C:\WINDOWS\Servicing\Sessions\31126970_1091286069.xml [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to read in xml content [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to load persisted information for session: 31126970_1091286069 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to load session: 31126970_1091286069 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Error                 CBS    Failed to load Session:31126970_1091286069 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to fully initialize session [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Startup: Failed to initialize exising session: 31126970_1091286069 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Startup: delete session as corrupt since it fails to load, Session: 31126970_1091286069 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to open package file: \\?\C:\WINDOWS\Servicing\Sessions\31126981_3943944377.xml [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to read in xml content [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to load persisted information for session: 31126981_3943944377 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to load session: 31126981_3943944377 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Error                 CBS    Failed to load Session:31126981_3943944377 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to fully initialize session [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Startup: Failed to initialize exising session: 31126981_3943944377 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Startup: delete session as corrupt since it fails to load, Session: 31126981_3943944377 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Session: 31126988_3608798205 initialized by client Arbiter, external staging directory: (null)
+2024-08-24 14:09:32, Info                  CBS    Startup: Mark session as corrupt since it is neither complete nor pended, Session: 31126988_3608798205, State:Started
+2024-08-24 14:09:32, Info                  CBS    Removing the pending hard reserve adjustment for Client: Arbiter, Session: 31126988_3608798205
+2024-08-24 14:09:32, Info                  CBS    Failed to open package file: \\?\C:\WINDOWS\Servicing\Sessions\31126990_3355861633.xml [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to read in xml content [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to load persisted information for session: 31126990_3355861633 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to load session: 31126990_3355861633 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Error                 CBS    Failed to load Session:31126990_3355861633 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Failed to fully initialize session [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Startup: Failed to initialize exising session: 31126990_3355861633 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Startup: delete session as corrupt since it fails to load, Session: 31126990_3355861633 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
+2024-08-24 14:09:32, Info                  CBS    Session: 31126998_1240325652 initialized by client Arbiter, external staging directory: (null)
+2024-08-24 14:09:32, Info                  CBS    Startup: Mark session as corrupt since it is neither complete nor pended, Session: 31126998_1240325652, State:Installed
+2024-08-24 14:09:32, Info                  CBS    Removing the pending hard reserve adjustment for Client: Arbiter, Session: 31126998_1240325652
+2024-08-24 14:09:32, Info                  CBS    Session: 31126998_4131210413 initialized by client UpdateAgentLCU, external staging directory: (null)
+2024-08-24 14:09:32, Info                  CBS    Shtd: Finalizing Execution Engine.
+2024-08-24 14:09:32, Info                  CBS    Execution Engine Finalize
+2024-08-24 14:09:32, Info                  CBS    Execution Engine Finalize
+2024-08-24 14:09:32, Info                  CBS    Execution Engine Finalize
+2024-08-24 14:09:32, Info                  CBS    Execution Engine Finalize
+2024-08-24 14:09:32, Info                  CBS    Disabling LKG boot option
+2024-08-24 14:09:32, Info                  CBS    Shtd: Initializing driver operations queue.
+2024-08-24 14:09:32, Info                  CBS    Shtd: current ExecuteState is CbsExecuteStateStageDrivers
+2024-08-24 14:09:32, Info                  CBS    Free disk space check on C:. Available: 89000MB, Required size (Lang neutral): 0MB, Required size (Per language): 0MB, Languages installed: 2, Total Required: 0MB
+2024-08-24 14:09:32, Info                  CBS    SetProgressMessage: progressMessageStage: -1, ExecuteState: CbsExecuteStateStageDrivers, SubStage: 0
+2024-08-24 14:09:32, Info                  CBS    SetProgressMessage: progressMessageStage: -1, ExecuteState: CbsExecuteStateStageDrivers, SubStage: 1
+2024-08-24 14:09:32, Info                  CBS    Doqe: Disabling Device installs
+2024-08-24 14:09:32, Info                  CBS    Doqe: Locking driver updates, Count 1626
+2024-08-24 14:09:32, Info                  CSI    00000002 CSI Store 3208350455968 initialized
+2024-08-24 14:09:32, Info                  CSI    00000003 Performing 1 operations as follows:
