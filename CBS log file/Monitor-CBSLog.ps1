@@ -25,10 +25,10 @@
     The path to the CBS log file. Default is "$env:SystemRoot\Logs\CBS\CBS.log".
 
 .PARAMETER TailLines
-    The number of lines to display from the end of the log file. Default is 10.
+    The number of lines to display from the end of the log file. Default is 0 so only new lines output.
 
 .PARAMETER Delay
-    The delay in seconds between each check of the log file. Default is 1 second.
+    The delay, in seconds, to wait for the log file to be created if it does not exist. The default is 5 seconds.
 
 .PARAMETER LogLevel
     Display only specific log levels. "All", "Info", "Warning", "Error". Default is "All".
@@ -41,42 +41,61 @@
 
 param (
     [string]$FileName = "$env:SystemRoot\Logs\CBS\CBS.log",
-    [int]$TailLines = 10,
-    [int]$Delay = 1,
+    [int]$TailLines = 0,
+    [int]$Delay = 5,
     [ValidateSet("All", "Info", "Warning", "Error")]
     [string]$LogLevel = "All"
 )
 
-# Wait for the file to be created
-while (-Not (Test-Path $FileName)) {
-    Write-Host "Waiting for the file '$FileName' to be created..." -ForegroundColor Yellow
-    Start-Sleep -Seconds $Delay
-}
+# Set the debug and verbose preferences to display messages
+$DebugPreference = "Continue"
+$VerbosePreference = "Continue"
 
-# Once the file is found, start monitoring it
-Get-Content $FileName -Wait -Tail $TailLines | ForEach-Object {
-    $line = $_
-    if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+)$') {
-        $date = $matches['date']
-        $time = $matches['time']
-        $level = $matches['level'].Trim()
-        $component = $matches['component'].Trim()
-        $message = $matches['message'].Trim()
+# Initialize the line count
+[int]$lineCount = 0
 
-        if ($LogLevel -eq "All" -or $LogLevel -eq $level) {
-            # Set color based on log level
-            switch ($level) {
-                "Error" { $color = "DarkRed" }
-                "Warning" { $color = "Yellow" }
-                "Info" { $color = "Green" }
-                default { $color = "White" }
-            }
-            Write-Host "$date $time`t" -NoNewline -ForegroundColor DarkGreen
-            Write-Host "[$level] > `t" -NoNewline -ForegroundColor $color
-            Write-Host "$component`t" -NoNewline -ForegroundColor Magenta
-            Write-Host "$message"
-        }
-    } else {
-        # Write-Host $line.Trim()
+Clear-Host
+try {
+    # Wait for the file to be created, as Get-Content with -Wait doesn't wait for the file to be created.
+    while (-Not (Test-Path $FileName)) {
+        Write-Host "Waiting for the file '$FileName' to be created..." -ForegroundColor Yellow
+        Start-Sleep -Seconds $Delay
     }
+
+    # Once the file is found, start monitoring it
+    Get-Content $FileName -Wait -Tail $TailLines | ForEach-Object {
+        $line = $_
+
+        $lineCount++
+        
+        if ($line -match '^(?<date>\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}), (?<level>\w+)\s+(?<component>\w+)\s+(?<message>.+)$') {
+            $date = $matches['date']
+            $time = $matches['time']
+            $level = $matches['level'].Trim()
+            $component = $matches['component'].Trim()
+            $message = $matches['message'].Trim()
+
+            if ($LogLevel -eq "All" -or $LogLevel -eq $level) {
+                # Set color based on log level
+                switch ($level) {
+                    "Error" { $color = "DarkRed" }
+                    "Warning" { $color = "Yellow" }
+                    "Info" { $color = "Green" }
+                    default { $color = "White" }
+                }
+                Write-Host "$date $time` " -NoNewline -ForegroundColor DarkGreen
+                Write-Host "[$level] >` " -NoNewline -ForegroundColor $color
+                Write-Host "$component`: " -NoNewline -ForegroundColor Magenta
+                Write-Host "$message"
+            }
+        } else {
+            # Show line for debugging
+            Write-Verbose "Unmatched line: $line"
+        }
+    }
+} catch {
+    Write-Host "An error occurred." -ForegroundColor Red
+    Write-Verbose "An error occurred: $_"
+} finally {
+    Write-Host "Script stopped. Total lines processed: $lineCount" -ForegroundColor Cyan
 }
