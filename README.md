@@ -25,3 +25,6 @@ DISM /Online /Cleanup-Image /RestoreHealth
 I tried updating again, this fixed the issues.
 
 > ***Note:*** I tried this, and is not simply a recommendation. If you are unsure, check online.
+
+Example:
+![Example](image.png)
