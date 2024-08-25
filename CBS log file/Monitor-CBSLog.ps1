@@ -30,16 +30,21 @@
 .PARAMETER Delay
     The delay in seconds between each check of the log file. Default is 1 second.
 
-.EXAMPLE
-    .\Monitor-CBSLog.ps1 -FileName "C:\Windows\Logs\CBS\CBS.log" -TailLines 20 -Delay 2
+.PARAMETER LogLevel
+    Display only specific log levels. "All", "Info", "Warning", "Error". Default is "All".
 
-    This example runs the script with a specified log file, displays the last 20 lines, and sets a delay of 2 seconds between checks.
+.EXAMPLE
+    .\Monitor-CBSLog.ps1 -FileName "C:\Windows\Logs\CBS\CBS.log" -TailLines 20 -Delay 2 -Level "Error"
+
+    This example runs the script with a specified log file, displays the last 20 lines of "Error", and sets a delay of 2 seconds between checks.
 #>
 
 param (
     [string]$FileName = "$env:SystemRoot\Logs\CBS\CBS.log",
     [int]$TailLines = 10,
-    [int]$Delay = 1
+    [int]$Delay = 1,
+    [ValidateSet("All", "Info", "Warning", "Error")]
+    [string]$LogLevel = "All"
 )
 
 # Wait for the file to be created
@@ -58,22 +63,23 @@ while ($true) {
             $time = $matches['time']
             $level = $matches['level'].Trim()
             $component = $matches['component'].Trim()
-            $message = $matches['message']
+            $message = $matches['message'].Trim()
 
-            # Set color based on log level
-            switch ($level) {
-                "Error" { $color = "Red" }
-                "Warning" { $color = "Yellow" }
-                "Info" { $color = "Green" }
-                default { $color = "White" }
+            if ($LogLevel -eq "All" -or $LogLevel -eq $level) {
+                # Set color based on log level
+                switch ($level) {
+                    "Error" { $color = "DarkRed" }
+                    "Warning" { $color = "Yellow" }
+                    "Info" { $color = "Green" }
+                    default { $color = "White" }
+                }
+                Write-Host "$date $time`t" -NoNewline -ForegroundColor DarkGreen
+                Write-Host "[$level] > `t" -NoNewline -ForegroundColor $color
+                Write-Host "$component`t" -NoNewline -ForegroundColor Magenta
+                Write-Host "$message"
             }
-
-            Write-Host "$date $time`t" -NoNewline -ForegroundColor Yellow
-            Write-Host "$level`t" -NoNewline -ForegroundColor $color
-            Write-Host "$component`t" -NoNewline -ForegroundColor Magenta
-            Write-Host "$message"
         } else {
-            Write-Host $line
+             # Write-Host $line.Trim()
         }
     }
     Start-Sleep -Seconds $Delay
