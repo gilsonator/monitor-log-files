@@ -6,7 +6,7 @@ Feel free to explore and provide feedback.
 
 *More to come...*
 
-## Monitor CBS log file
+## CBS log file
 I was experiencing extremely slow download and the errors in Windows Update. I found the errors in the log file:
 
 ```
