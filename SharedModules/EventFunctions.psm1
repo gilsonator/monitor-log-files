@@ -21,9 +21,7 @@ function Get-FilterXml {
         [string]$EventLevels,
         $TimeDiff = 3600000 # Default to last hour in milliseconds
     )
-    
-    
-    Format-EventLevelsSQL()
+
  @"
 <QueryList>
   <Query Id="0" Path="$LogPath">
