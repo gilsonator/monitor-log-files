@@ -20,7 +20,7 @@
     The delay, in seconds, to wait for the log file to be created if it does not exist. The default is 5 seconds.
 
 .PARAMETER EventLevels
-    Display only specific event levels, seperated by comma. 
+    Display only specific event levels, seperated by comma: (4,5,2)
     0 (Verbose)     1 (Critical)     2  (Error)     3  (Warning)     4  (Information) 
 
 .EXAMPLE
@@ -28,46 +28,38 @@
 #>
 param (
     [ValidateSet(0, 1, 2, 3, 4)]
-    [int[]]$EventLevels = (4,5), # -EventLevels (0,1,2,3,4)
+    [int[]]$EventLevels = (4,5,2), # -EventLevels (0,1,2,3,4)
     [int]$Hours = 1 # -Hours 12 
 )
 Clear-Host
 $MilliSeconds = 3600000 * $Hours # (60 * 60 * 1000)
 
 # (Level=1 or Level=2 or Level=3)
-# $LevelsQuery = $EventLevels | ForEach-Object { "Level=$_ or" } 
+$stringBuilder = New-Object System.Text.StringBuilder
+foreach ($lvl in $EventLevels) {
+    $formattedString = "Level={0} or " -f $lvl
+    $stringBuilder.Append($formattedString) | Out-Null
+} 
 
-$LevelsQuery += ForEach-Object -Begin {
-    $count = 0
-    $retValue = ""
-} -Process {
-    $count++
+# Remove any trailing spaces, ‘o’, or ‘r’ characters from the end of the string. 
+# This is useful when you want to ensure that the exact sequence " or " is removed from the end of the string.
+$LevelsQuery = $stringBuilder.ToString().TrimEnd(" or ".ToCharArray())
 
-    if ($count -ne $myArray.Count) {
-        $retValue += $_
-    } else {
-        $retValue += "Level="
-    }
-     #+ ($isLast ? " last" : "")
-} -End { $retValue }
+# I know XML very much - So I decided to use the FilterXML parameter:
+$xmlQuery = @"
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-WindowsUpdateClient/Operational">
+    <Select Path="Microsoft-Windows-WindowsUpdateClient/Operational">*[System[($LevelsQuery) 
+        and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]</Select>
+  </Query>
+</QueryList>
+"@
 
-Write-Host $LevelsQuery
+Write-Debug $xmlQuery
 
-# I know XML very much - Using the FilterXML parameter:
-#$xmlQuery = @"
-#<QueryList>
-#  <Query Id="0" Path="Microsoft-Windows-WindowsUpdateClient/Operational">
-#    <Select Path="Microsoft-Windows-WindowsUpdateClient/Operational">*[System[($LevelsQuery) 
-#        and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]</Select>
-#  </Query>
-#</QueryList>
-#"@
-#
-#Write-Debug $xmlQuery
-#
-#$events = Get-WinEvent -FilterXML $xmlQuery
-#
-## Write-Host $events.Level
+$events = Get-WinEvent -FilterXML $xmlQuery
+
+$events | Format-Table -AutoSize  
 #foreach ($event in $events) {
 #    switch ($event.Level) {
 #        0 { if (0 -in $EventLevels) { Write-Host "Verbose" -ForegroundColor Gray } }
