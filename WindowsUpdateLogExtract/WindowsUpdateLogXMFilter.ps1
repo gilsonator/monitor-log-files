@@ -3,47 +3,71 @@
     Simple Windows Event Filter.
 
 .DESCRIPTION
-    This script ouputs the Windows Update log file, highlighting different log levels with colours.
+    This script outputs any events recorded in Windows Events, highlighting different log levels with colors.
 
     By David Gilson
-    
-    Found LogName using:
+
+.NOTES    
+    I found the LogName using:
     Get-WinEvent -ListLog '*Update*' | Select-Object -Property 'LogName'
 
 .LINK
     https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent?view=powershell-7.4 
 
-.PARAMETER TailLines
-    The number of lines to display from the end of the log file. Default is 0 so only new lines output.
-
-.PARAMETER Delay
-    The delay, in seconds, to wait for the log file to be created if it does not exist. The default is 5 seconds.
-
 .PARAMETER EventLevels
-    Display only specific event levels, seperated by comma: (4,5,2)
-    0 (Verbose)     1 (Critical)     2  (Error)     3  (Warning)     4  (Information) 
+    Display only specific event levels, separated by commas. Defaults to (1,2,3).
+    0 (Verbose)     1 (Critical)     2 (Error)     3 (Warning)     4 (Information) 
+
+.PARAMETER Hours
+    Display only specific events in the last number of hours from now. Defaults to the last 24 hours.
 
 .EXAMPLE
-    
+    WindowsUpdateLogXMLFilter.ps1 -EventLevels (1,2,3) -Hours 24
+    Will search for Critical, Error, or Warning events recorded in the last 24 hours from now.
 #>
+
 param (
-    [ValidateSet(0, 1, 2, 3, 4)]
-    [int[]]$EventLevels = (4,5,2), # -EventLevels (0,1,2,3,4)
-    [int]$Hours = 1 # -Hours 12 
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("Verbose", "Critical", "Error", "Warning", "Information")]
+    [string[]]$EventLevels = ("Critical", "Error", "Warning", "Information"),
+    
+#    [Parameter(Mandatory=$false)]
+#    [ValidateSet(0, 1, 2, 3, 4)]
+#    [int[]]$EventLevels = (1,2,3), # -EventLevels (1,2,3)
+
+    [Parameter(Mandatory=$false)]
+    # [ValidateSet()]
+    [int]$Hours = 24 # -Hours 24 
 )
+
 Clear-Host
+# $ErrorActionPreference = "Stop"
+
 $MilliSeconds = 3600000 * $Hours # (60 * 60 * 1000)
 
 # (Level=1 or Level=2 or Level=3)
 $stringBuilder = New-Object System.Text.StringBuilder
-foreach ($lvl in $EventLevels) {
-    $formattedString = "Level={0} or " -f $lvl
-    $stringBuilder.Append($formattedString) | Out-Null
+
+#foreach ($Level in $EventLevels) {
+#    $formattedString = "Level={0} or " -f $Level
+#    $stringBuilder.Append($formattedString) | Out-Null
+#} 
+
+foreach ($Level in $EventLevels) {
+    switch ($Level) {
+        "Verbose"       { $stringBuilder.Append("Level=0 or ") | Out-Null}
+        "Critical"      { $stringBuilder.Append("Level=1 or ") | Out-Null}
+        "Error"         { $stringBuilder.Append("Level=2 or ") | Out-Null}
+        "Warning"       { $stringBuilder.Append("Level=3 or ") | Out-Null}
+        "Information"   { $stringBuilder.Append("Level=4 or ") | Out-Null}
+    }
 } 
 
 # Remove any trailing spaces, ‘o’, or ‘r’ characters from the end of the string. 
 # This is useful when you want to ensure that the exact sequence " or " is removed from the end of the string.
 $LevelsQuery = $stringBuilder.ToString().TrimEnd(" or ".ToCharArray())
+
+Write-Debug $LevelsQuery
 
 # I know XML very much - So I decided to use the FilterXML parameter:
 $xmlQuery = @"
@@ -57,19 +81,22 @@ $xmlQuery = @"
 
 Write-Debug $xmlQuery
 
-$events = Get-WinEvent -FilterXML $xmlQuery
-
-$events | Format-Table -AutoSize  
-#foreach ($event in $events) {
-#    switch ($event.Level) {
-#        0 { if (0 -in $EventLevels) { Write-Host "Verbose" -ForegroundColor Gray } }
-#        1 { if (1 -in $EventLevels) { Write-Host "Critical" -ForegroundColor Red } }
-#        2 { if (2 -in $EventLevels) { Write-Host "Warning" -ForegroundColor Yellow } }
-#        3 { if (3 -in $EventLevels) { Write-Host "Log level: 3 (Warning)" -ForegroundColor Yellow } }
-#        4 { if (4 -in $EventLevels) { Write-Host "Information" -ForegroundColor Green } }
-#        Default { Write-Host "Unknown log level" -ForegroundColor White }
-#    }
-#}
+try {
+    $events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
+    $events #| Format-Table -AutoSize 
+}
+catch {
+    $formattedString = "No Windows Update Events recorded in the past "
+    $formattedNumber = "{0:N0}" -f $Hours
+    if ($Hours -gt 1) { 
+        $formattedString += $formattedNumber + " hours." 
+    } else { 
+        $formattedString += $formattedNumber + " hour." 
+    }
+}
+finally {
+    Write-Host $formattedString
+}
 
 # DG: Other ways...
 # Using the Where-Object cmdlet:
