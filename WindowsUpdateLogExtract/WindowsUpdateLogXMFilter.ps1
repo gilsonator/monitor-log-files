@@ -25,49 +25,42 @@
     WindowsUpdateLogXMLFilter.ps1 -EventLevels (1,2,3) -Hours 24
     Will search for Critical, Error, or Warning events recorded in the last 24 hours from now.
 #>
-
 param (
     [Parameter(Mandatory=$false)]
     [ValidateSet("Verbose", "Critical", "Error", "Warning", "Information")]
-    [string[]]$EventLevels = ("Critical", "Error", "Warning", "Information"),
-    
-#    [Parameter(Mandatory=$false)]
-#    [ValidateSet(0, 1, 2, 3, 4)]
-#    [int[]]$EventLevels = (1,2,3), # -EventLevels (1,2,3)
+    [string[]]$EventLevels = @("Information"),
 
     [Parameter(Mandatory=$false)]
-    # [ValidateSet()]
+    [ValidateRange(1, 24)]
     [int]$Hours = 24 # -Hours 24 
 )
 
 Clear-Host
 # $ErrorActionPreference = "Stop"
 
-$MilliSeconds = 3600000 * $Hours # (60 * 60 * 1000)
-
-# (Level=1 or Level=2 or Level=3)
 $stringBuilder = New-Object System.Text.StringBuilder
 
-#foreach ($Level in $EventLevels) {
-#    $formattedString = "Level={0} or " -f $Level
-#    $stringBuilder.Append($formattedString) | Out-Null
-#} 
+# Map levels to their corresponding values
+$levelMap = @{
+    "Verbose" = 0
+    "Critical" = 1
+    "Error" = 2
+    "Warning" = 3
+    "Information" = 4
+}
 
+# Iterate through the EventLevels array
 foreach ($Level in $EventLevels) {
-    switch ($Level) {
-        "Verbose"       { $stringBuilder.Append("Level=0 or ") | Out-Null}
-        "Critical"      { $stringBuilder.Append("Level=1 or ") | Out-Null}
-        "Error"         { $stringBuilder.Append("Level=2 or ") | Out-Null}
-        "Warning"       { $stringBuilder.Append("Level=3 or ") | Out-Null}
-        "Information"   { $stringBuilder.Append("Level=4 or ") | Out-Null}
-    }
-} 
+    $stringBuilder.Append("Level=$($levelMap[$Level]) or ") | Out-Null
+}
 
 # Remove any trailing spaces, ‘o’, or ‘r’ characters from the end of the string. 
 # This is useful when you want to ensure that the exact sequence " or " is removed from the end of the string.
 $LevelsQuery = $stringBuilder.ToString().TrimEnd(" or ".ToCharArray())
 
 Write-Debug $LevelsQuery
+
+$MilliSeconds = 3600000 * $Hours # (60 * 60 * 1000)
 
 # I know XML very much - So I decided to use the FilterXML parameter:
 $xmlQuery = @"
@@ -93,8 +86,6 @@ catch {
     } else { 
         $formattedString += $formattedNumber + " hour." 
     }
-}
-finally {
     Write-Host $formattedString
 }
 
