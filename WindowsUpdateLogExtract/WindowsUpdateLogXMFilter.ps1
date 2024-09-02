@@ -78,13 +78,13 @@ try {
     $events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
     # $events | Format-Table -AutoSize 
 
-    Write-Host "TimeCreated`t`tId`tMessage" -ForegroundColor Blue
+    Write-Host "Date`tTime`tLevel`t`tMessage" -ForegroundColor Blue
     foreach ($event in $events) {
         Write-Host $event.TimeCreated -ForegroundColor Green -NoNewline
         Write-Host "`t" -NoNewline
-        Write-Host $event.Id -ForegroundColor Yellow -NoNewline
+        Write-Host $event.LevelDisplayName -ForegroundColor $() -NoNewline
         Write-Host "`t" -NoNewline
-        Write-Host $event.Message -ForegroundColor Red
+        Write-Host $event.Message -ForegroundColor White
     }
 }
 catch {
@@ -115,12 +115,11 @@ No Windows Update Events ($($EventLevels -join ', ')) returned in the past $form
 # $PastDate = (Get-Date) - (New-TimeSpan -Hours $HoursDiff)
 # Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' 
 #    | Where-Object { $_.TimeCreated -ge $PastDate }
-    
 
 # Using the FilterHashtable parameter:
 # $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
-# Get-WinEvent -FilterHashtable @{ LogName='Windows PowerShell'; Level=3; StartTime=$Yesterday }
+# Get-WinEvent -FilterHashtable @{ LogName='Microsoft-Windows-WindowsUpdateClient/Operational'; Level=3; StartTime=$Yesterday }
 
 # Using the FilterXPath parameter:
 # $XPath = '*[System[Level=3 and TimeCreated[timediff(@SystemTime) &lt;= 86400000]]]'
-# Get-WinEvent -LogName 'WindowsUpdateClient' -FilterXPath $XPath
+# Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' -FilterXPath $XPath
