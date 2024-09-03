@@ -78,11 +78,11 @@ try {
     $events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
     # $events | Format-Table -AutoSize 
 
-    Write-Host "Date`tTime`tLevel`t`tMessage" -ForegroundColor Blue
+    Write-Host "Date`t`t`tLevel`t`tMessage" -ForegroundColor Blue
     foreach ($event in $events) {
         Write-Host $event.TimeCreated -ForegroundColor Green -NoNewline
         Write-Host "`t" -NoNewline
-        Write-Host $event.LevelDisplayName -ForegroundColor $() -NoNewline
+        Write-Host $event.LevelDisplayName -ForegroundColor Yellow -NoNewline
         Write-Host "`t" -NoNewline
         Write-Host $event.Message -ForegroundColor White
     }
