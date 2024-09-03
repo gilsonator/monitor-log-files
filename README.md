@@ -27,14 +27,14 @@ I tried updating again, this fixed the issues.
 > ***Note:*** I tried this, and is not simply a recommendation. If you are unsure, check online.
 
 Example:
-![Example](CBSLogMonitoring.png)
+![Example](./CBS%20log%20file/CBSLogMonitoring.png)
 
 ## Windows Update Log XML Filter.
 
 This script outputs any events recorded in Windows Events, highlighting different log levels with colors.
 
 Using Windows Event Viewer to create custom view, then copied XML, modified as required:
-![Custom View](CreateCustomView.png)
+![Custom View](./WindowsUpdateLogFilter/CreateCustomView.png)
 ![XML](XML.png)
 
 I have years of experience with XML - So I decided to use the `Get-WinEvent -FilterXML` parameter.
@@ -48,3 +48,5 @@ $xmlQuery = @"
 </QueryList>
 "@
 ```
+
+![Result](./WindowsUpdateLogFilter/result.png)
