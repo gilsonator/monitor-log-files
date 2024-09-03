@@ -35,7 +35,7 @@ param (
     [int]$Hours = 24 # -Hours 24 
 )
 
-Clear-Host
+# Clear-Host
 # $ErrorActionPreference = "Stop"
 
 $stringBuilder = New-Object System.Text.StringBuilder

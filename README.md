@@ -9,6 +9,8 @@ Feel free to explore and provide feedback.
 ## CBS log file
 I was experiencing extremely slow download and the errors in Windows Update. I found the errors in the log file:
 
+***Note:*** I tried this, and is not simply a recommendation. If you are unsure, check online.
+
 ```
 2024-08-24 14:09:32, Error CBS Failed to load Session:31126970_1091286069 [HRESULT = 0x80070002 - ERROR_FILE_NOT_FOUND]
 ```
@@ -24,8 +26,6 @@ DISM /Online /Cleanup-Image /RestoreHealth
 
 I tried updating again, this fixed the issues.
 
-> ***Note:*** I tried this, and is not simply a recommendation. If you are unsure, check online.
-
 Example:
 ![Example](./CBS%20log%20file/CBSLogMonitoring.png)
 
@@ -35,6 +35,7 @@ This script outputs any events recorded in Windows Events, highlighting differen
 
 Using Windows Event Viewer to create custom view, then copied XML, modified as required:
 ![Custom View](./WindowsUpdateLogFilter/CreateCustomView.png)
+
 ![XML](./WindowsUpdateLogFilter/XML.png)
 
 I have years of experience with XML - So I decided to use the `Get-WinEvent -FilterXML` parameter.
@@ -48,5 +49,5 @@ $xmlQuery = @"
 </QueryList>
 "@
 ```
-
-![Result](./WindowsUpdateLogFilter/result.png)
+Example:
+![Results](./WindowsUpdateLogFilter/results.png)
