@@ -29,7 +29,7 @@ I tried updating again, this fixed the issues.
 Example:
 ![Example](CBSLogMonitoring.png)
 
-## Simple Windows Event Filter.
+## Windows Update Log XML Filter.
 
 This script outputs any events recorded in Windows Events, highlighting different log levels with colors.
 
