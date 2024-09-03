@@ -76,7 +76,6 @@ Write-Debug $xmlQuery
 
 try {
     $events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
-    # $events | Format-Table -AutoSize 
 
     Write-Host "Date`t`t`tLevel`t`tMessage" -ForegroundColor Blue
     foreach ($event in $events) {
@@ -88,30 +87,19 @@ try {
     }
 }
 catch {
-    
-    $formattedNumber = "{0:N0}" -f $Hours
-    # Modified from this...
-    <# 
-    $formattedString = "No Windows Update Events ($($EventLevels -join ', ')) recorded in the past "
-    if ($Hours -gt 1) { 
-       $formattedString += $formattedNumber + " hours." 
-    } else { 
-       $formattedString += $formattedNumber + " hour." 
-    }
-    Write-Host $formattedString -ForegroundColor Yellow 
-    Write-Host ""
-    #>
-    # To this: to combine in one line, Which is better? I feel the above is easier to read, and debug
-    
-    Write-Host -ForegroundColor Yellow @"
-No Windows Update Events ($($EventLevels -join ', ')) returned in the past $formattedNumber $($Hours -gt 1 ? "hours." : "hour." )
-
-"@
+    Write-Host  "No Windows Update Events ($($EventLevels -join ', '))" `
+                " returned in the past $($Hours -gt 1 ? "{0:N0} hours" -f $Hours : "hour")" -ForegroundColor Yellow
 }
 
-# DG: Other ways, not complete...
-# Using the Where-Object cmdlet:
+# DG NOTES: There are other ways to accomplish this:
+#
+# Using the FilterXPath parameter (simpler):
+# $XPath = "*[System[($LevelsQuery) and TimeCreated[timediff(@SystemTime) &lt;= $MilliSeconds]]]"
+# Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' -FilterXPath $XPath
 
+# Not Completed:
+
+# Using the Where-Object cmdlet:
 # $PastDate = (Get-Date) - (New-TimeSpan -Hours $HoursDiff)
 # Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' 
 #    | Where-Object { $_.TimeCreated -ge $PastDate }
@@ -120,6 +108,3 @@ No Windows Update Events ($($EventLevels -join ', ')) returned in the past $form
 # $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
 # Get-WinEvent -FilterHashtable @{ LogName='Microsoft-Windows-WindowsUpdateClient/Operational'; Level=3; StartTime=$Yesterday }
 
-# Using the FilterXPath parameter:
-# $XPath = '*[System[Level=3 and TimeCreated[timediff(@SystemTime) &lt;= 86400000]]]'
-# Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' -FilterXPath $XPath
