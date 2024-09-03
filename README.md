@@ -35,7 +35,7 @@ This script outputs any events recorded in Windows Events, highlighting differen
 
 Using Windows Event Viewer to create custom view, then copied XML, modified as required:
 ![Custom View](./WindowsUpdateLogFilter/CreateCustomView.png)
-![XML](XML.png)
+![XML](./WindowsUpdateLogFilter/XML.png)
 
 I have years of experience with XML - So I decided to use the `Get-WinEvent -FilterXML` parameter.
 ```XML
