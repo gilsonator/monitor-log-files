@@ -28,3 +28,23 @@ I tried updating again, this fixed the issues.
 
 Example:
 ![Example](CBSLogMonitoring.png)
+
+## Simple Windows Event Filter.
+
+This script outputs any events recorded in Windows Events, highlighting different log levels with colors.
+
+Using Windows Event Viewer to create custom view, then copied XML, modified as required:
+![Custom View](CreateCustomView.png)
+![XML](XML.png)
+
+I have years of experience with XML - So I decided to use the `Get-WinEvent -FilterXML` parameter.
+```XML
+$xmlQuery = @"
+<QueryList>
+  <Query Id="0" Path="Microsoft-Windows-WindowsUpdateClient/Operational">
+    <Select Path="Microsoft-Windows-WindowsUpdateClient/Operational">*[System[($LevelsQuery) 
+        and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]</Select>
+  </Query>
+</QueryList>
+"@
+```
