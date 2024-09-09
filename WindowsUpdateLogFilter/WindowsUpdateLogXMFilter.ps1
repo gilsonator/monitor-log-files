@@ -102,17 +102,18 @@ $events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
 # $XPath = "*[System[($LevelsQuery) and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]"
 # $events = Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' -FilterXPath $XPath
 
-if ($ExportCSV) {
-    $filteredEvents = @()
-} else {
-    Write-Host "Date`t`t`tLevel`t`tMessage`t`tDetails" -ForegroundColor Blue 
-}
-
 if ($events.Count -eq 0) {
     Write-Host  "No Windows Update Events ($($EventLevels -join ', '))" `
-                "returned in the past $($Hours -gt 1 ? "{0:N0} hours" -f $Hours : "hour")" -ForegroundColor Yellow
+    "returned in the past $($Hours -gt 1 ? "{0:N0} hours" -f $Hours : "hour")" -ForegroundColor Yellow
 } else {
-    foreach ($event in $events) {
+    if ($ExportCSV) {
+        $filteredEvents = @()
+    } else {
+        Write-Host "Date`t`t`tLevel`t`tMessage`t`t`t`tDetails" -ForegroundColor Blue 
+    }
+
+    $sortedEvents = $events | Sort-Object -Property TimeCreated
+    foreach ($event in $sortedEvents) {
         if ($ExportCSV) {
             $filteredEvent  = [PSCustomObject]@{
                 TimeCreated = $event.TimeCreated
