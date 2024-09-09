@@ -3,7 +3,7 @@
     Simple Windows Event Filter.
 
 .DESCRIPTION
-    This script outputs any events recorded in Windows Events, highlighting different log levels with colors.
+    This script outputs any events recorded in Windows Events, highlighting different log levels with colors, sorts by TimeCreated
 
     By David Gilson
 
