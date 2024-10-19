@@ -26,7 +26,7 @@ DISM /Online /Cleanup-Image /RestoreHealth
 
 I tried updating again, this fixed the issues.
 
-Example:
+### Examples:
 ![Example](./CBS%20log%20file/CBSLogMonitoring.png)
 
 ## Windows Update Log XML Filter.
