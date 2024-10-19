@@ -47,12 +47,9 @@ param (
     [string]$LogLevel = "All"
 )
 
+# Set console title
 $title = 'Monitor-CBS Logfile'
-
 Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
-
-# Using the escape sequence.
-# Write-Host "$([char]0x1B)]0;$title`a"
 
 # Set the debug and verbose preferences to display messages
 $DebugPreference = "Continue"
@@ -120,10 +117,15 @@ try {
             # Show line for debugging
             Write-Verbose "Unmatched line: $line"
         }
+
+        $title = "Monitor-CBS Logfile - ($($lineCount))"
+        Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
     }
 } catch {
     Write-Host "An error occurred." -ForegroundColor Red
     Write-Verbose "An error occurred: $_"
 } finally {
     Write-Host "Script stopped. Total lines processed: $lineCount" -ForegroundColor Cyan
+    $title = '' # Reset title
+    Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
 }
