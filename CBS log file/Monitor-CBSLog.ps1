@@ -17,9 +17,15 @@
     CMI (Component Management Infrastructure)
     SMI (Systems Management Infrastructure)
     KTM (Kernel Transaction Manager)
+    
+.LINK
+    https://github.com/gilsonator/monitor-log-files
 
 .LINK
     https://techcommunity.microsoft.com/t5/ask-the-performance-team/understanding-component-based-servicing/ba-p/373012
+
+.LINK
+    https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 
 .PARAMETER FileName
     The path to the CBS log file. Default is "$env:SystemRoot\Logs\CBS\CBS.log".
