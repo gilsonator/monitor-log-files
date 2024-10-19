@@ -117,7 +117,7 @@ try {
                     $bingSearchUrl = "https://www.bing.com/search?q=$encodedSearchTerm"
 
                     Write-Host " ($bingSearchUrl)" -ForegroundColor DarkGray
-                } else { Write-Host ""}
+                }
             }
         } else {
             # Show line for debugging
