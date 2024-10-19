@@ -47,6 +47,13 @@ param (
     [string]$LogLevel = "All"
 )
 
+$title = 'Monitor-CBS Logfile'
+
+Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
+
+# Using the escape sequence.
+# Write-Host "$([char]0x1B)]0;$title`a"
+
 # Set the debug and verbose preferences to display messages
 $DebugPreference = "Continue"
 $VerbosePreference = "Continue"
