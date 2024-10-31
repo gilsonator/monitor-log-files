@@ -24,6 +24,9 @@
 .PARAMETER ExportCSVPath
     Create a .csv file based on date/time, instead of outputting. Defaults to users temp folder
 
+.PARAMETER Pause
+    Pause output after filling the console window. Defaults to $false
+
 .EXAMPLE
     WindowsUpdateLogXMLFilter.ps1 -EventLevels Critical,Error,Warning -Hours 24
     Will search for Critical, Error, or Warning events recorded in the last 24 hours from now.
@@ -41,7 +44,11 @@ param (
     [bool]$ExportCSV = $false,
 
     [Parameter(Mandatory=$false)]
-    $ExportCSVPath = $env:Temp
+    $ExportCSVPath = $env:Temp,
+
+    # Pause on console height
+    [Parameter(Mandatory=$false)]
+    [switch]$Pause
 )
 
 if ($ExportCSV) {
@@ -113,6 +120,11 @@ if ($events.Count -eq 0) {
     }
 
     $sortedEvents = $events | Sort-Object -Property TimeCreated
+
+    # Initialize the line count
+    [int]$lineCount = 0
+    $consoleHeight = $Host.UI.RawUI.WindowSize.Height
+    
     foreach ($event in $sortedEvents) {
         if ($ExportCSV) {
             $filteredEvent  = [PSCustomObject]@{
@@ -124,6 +136,8 @@ if ($events.Count -eq 0) {
             # Add the filtered event to the array
             $filteredEvents += $filteredEvent
         } else { # Write to host
+            $lineCount++
+
             Write-Host $event.TimeCreated -ForegroundColor Green -NoNewline
             Write-Host "`t" -NoNewline
             Write-Host $event.LevelDisplayName -ForegroundColor Yellow -NoNewline
@@ -132,6 +146,11 @@ if ($events.Count -eq 0) {
             # For downloads, show package
             Write-Host "`t" -NoNewline
             Write-Host ($event.Opcode -eq 12 ? $event.Properties[0].Value : "") -ForegroundColor Magenta
+
+            if ($Pause -eq $true -and ($lineCount -gt $consoleHeight)) {
+                Read-Host -Prompt "Press Enter to continue..."
+                $lineCount = 0
+            }
         }
     }
 
