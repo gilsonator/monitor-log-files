@@ -123,7 +123,6 @@ if ($events.Count -eq 0) {
 
     # Initialize the line count
     [int]$lineCount = 0
-    $consoleHeight = $Host.UI.RawUI.WindowSize.Height
     
     foreach ($event in $sortedEvents) {
         if ($ExportCSV) {
@@ -137,7 +136,9 @@ if ($events.Count -eq 0) {
             $filteredEvents += $filteredEvent
         } else { # Write to host
             $lineCount++
-
+            $consoleHeight = $Host.UI.RawUI.WindowSize.Height
+            
+            Write-Debug $consoleHeight","$lineCount
             Write-Host $event.TimeCreated -ForegroundColor Green -NoNewline
             Write-Host "`t" -NoNewline
             Write-Host $event.LevelDisplayName -ForegroundColor Yellow -NoNewline
@@ -146,8 +147,8 @@ if ($events.Count -eq 0) {
             # For downloads, show package
             Write-Host "`t" -NoNewline
             Write-Host ($event.Opcode -eq 12 ? $event.Properties[0].Value : "") -ForegroundColor Magenta
-
-            if ($Pause -eq $true -and ($lineCount -gt $consoleHeight)) {
+            
+            if ($Pause -eq $true -and ($lineCount -gt $consoleHeight -4)) {
                 Read-Host -Prompt "Press Enter to continue..."
                 $lineCount = 0
             }
