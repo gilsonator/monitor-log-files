@@ -147,7 +147,7 @@ try {
         $title = "Monitor-CBS Logfile - ($($lineCount))"
         Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
         
-        if ((!$Wait.IsPresent) -and ($pauseLines -gt $consoleHeight - 4)) {
+        if ((!$Wait.IsPresent -and $Pause.IsPresent) -and ($pauseLines -gt $consoleHeight - 4)) {
             Read-Host -Prompt "Press Enter to continue..."
             $pauseLines = 0
         }                
