@@ -19,7 +19,7 @@
     "Verbose", "Critical", "Error", "Warning", "Information"
 
 .PARAMETER Hours
-    Display only specific events in the last number of hours from now. Defaults to the last 24 hours.
+    Display only specific events in the last number of hours from now. Defaults to the last 24 hours. Max is one week, 168 hours.
 
 .PARAMETER ExportCSVPath
     Create a .csv file based on date/time, instead of outputting. Defaults to users temp folder
@@ -37,7 +37,7 @@ param (
     [string[]]$EventLevels = @("Information"),
 
     [Parameter(Mandatory=$false)]
-    [ValidateRange(1, 72)]
+    [ValidateRange(1, 168)]
     [int]$Hours = 24, # -Hours 24 
 
     [Parameter(Mandatory=$false)]
