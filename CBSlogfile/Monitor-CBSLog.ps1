@@ -1,23 +1,21 @@
 <#
 .SYNOPSIS
-    Simple CBS Log Monitor - CBS (Component-Based Servicing)
+    Simple CBS Log Monitor - CBS (Component-Based Servicing).
 
 .DESCRIPTION
     This script monitors the CBS log file, highlighting different log levels with colours.
     It is similar to the Linux 'tail -F' command.
-
     By David Gilson
     
-    I created this to help diagnose issues I encountered while updating Windows 11.
+    I created this to help diagnose issues encountered while updating Windows 11.
+    The core componentization services include the following:
+    - CBS (Component Based Servicing)
+    - CSI (Component Servicing Infrastructure)
+    - DMI (Driver Management and Install)
+    - CMI (Component Management Infrastructure)
+    - SMI (Systems Management Infrastructure)
+    - KTM (Kernel Transaction Manager)
 
-    The Core componentization services include the following:
-    CBS (Component Based Servicing)
-    CSI (Component Servicing Infrastructure)
-    DMI (Driver Management and Install)
-    CMI (Component Management Infrastructure)
-    SMI (Systems Management Infrastructure)
-    KTM (Kernel Transaction Manager)
-    
 .LINK
     https://github.com/gilsonator/monitor-log-files
 
@@ -27,22 +25,30 @@
 .LINK
     https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 
+.LINK
+    https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-content?view=powershell-7.4#-wait
+
 .PARAMETER FileName
     The path to the CBS log file. Default is "$env:SystemRoot\Logs\CBS\CBS.log".
 
 .PARAMETER TailLines
-    The number of lines to display from the end of the log file. Default is 0 so only new lines output.
+    The number of lines to display from the end of the log file. Default is 0, so only new lines are output.
 
 .PARAMETER Delay
     The delay, in seconds, to wait for the log file to be created if it does not exist. The default is 5 seconds.
 
 .PARAMETER LogLevel
-    Display only specific log levels. "All", "Info", "Warning", "Error". Default is "All".
+    Display only specific log levels. Options are "All", "Info", "Warning", "Error". Default is "All".
+
+.PARAMETER Wait
+    Wait for changes in the source file. Default is $false.
+
+.PARAMETER Pause
+    If Wait is not specified, pause output after filling the console window. Default is $false.
 
 .EXAMPLE
-    .\Monitor-CBSLog.ps1 -FileName "C:\Windows\Logs\CBS\CBS.log" -TailLines 20 -Delay 2 -Level "Error"
-
-    This example runs the script with a specified log file, displays the last 20 lines of "Error", and sets a delay of 2 seconds between checks.
+    .\Monitor-CBSLog.ps1 -FileName "C:\Windows\Logs\CBS\CBS.log" -TailLines 20 -Delay 2 -LogLevel "Error"
+    This example runs the script with a specified log file, displays the last 20 lines of "Error" level logs, and sets a delay of 2 seconds between checks.
 #>
 
 param (
@@ -50,7 +56,11 @@ param (
     [int]$TailLines = 0,
     [int]$Delay = 5,
     [ValidateSet("All", "Info", "Warning", "Error")]
-    [string]$LogLevel = "All"
+    [string]$LogLevel = "All",
+    [Parameter(Mandatory=$false)]
+    [switch]$Wait = $false,
+    [Parameter(Mandatory=$false)]
+    [switch]$Pause
 )
 
 # Set console title
@@ -63,6 +73,7 @@ $VerbosePreference = "Continue"
 
 # Initialize the line count
 [int]$lineCount = 0
+[int]$pauseLines = 0
 
 Clear-Host
 try {
@@ -72,11 +83,20 @@ try {
         Start-Sleep -Seconds $Delay
     }
 
-    # Once the file is found, start monitoring it
-    Get-Content $FileName -Wait -Tail $TailLines | ForEach-Object {
+    # Once the file is found, start monitoring it, if -Wait is present
+    # I use Splatting to create a hashtable of parameters and pass -Wait on
+    $parameters = @{
+        Path = $FileName
+        Wait = $Wait
+        Tail = $TailLines
+    }
+    
+    Get-Content @parameters | ForEach-Object {
         $line = $_
 
         $lineCount++
+        $pauseLines++
+        $consoleHeight = $Host.UI.RawUI.WindowSize.Height
 
         # Adding match for hresultmsg:
         # Note: Using one Regex pattern gives better performace, one pass, but harder to read.
@@ -123,9 +143,14 @@ try {
             # Show line for debugging
             Write-Verbose "Unmatched line: $line"
         }
-
+        
         $title = "Monitor-CBS Logfile - ($($lineCount))"
         Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
+        
+        if ((!$Wait.IsPresent) -and ($pauseLines -gt $consoleHeight - 4)) {
+            Read-Host -Prompt "Press Enter to continue..."
+            $pauseLines = 0
+        }                
     }
 } catch {
     Write-Host "An error occurred." -ForegroundColor Red
