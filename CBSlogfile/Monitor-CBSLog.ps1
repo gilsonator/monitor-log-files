@@ -41,7 +41,7 @@
     Display only specific log levels. Options are "All", "Info", "Warning", "Error". Default is "All".
 
 .PARAMETER Wait
-    Wait for changes in the source file. Default is $false.
+    Wait for changes in the source file. Default is $true.
 
 .PARAMETER Pause
     If Wait is not specified, pause output after filling the console window. Default is $false.
@@ -58,7 +58,7 @@ param (
     [ValidateSet("All", "Info", "Warning", "Error")]
     [string]$LogLevel = "All",
     [Parameter(Mandatory=$false)]
-    [switch]$Wait = $false,
+    [switch]$Wait,
     [Parameter(Mandatory=$false)]
     [switch]$Pause
 )
