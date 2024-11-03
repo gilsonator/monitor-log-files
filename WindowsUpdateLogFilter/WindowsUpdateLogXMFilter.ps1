@@ -21,6 +21,11 @@
 .PARAMETER Hours
     Display only specific events in the last number of hours from now. Defaults to the last 24 hours. Max is one week, 168 hours.
 
+.PARAMETER ExportCSV
+    Export results to comma seperated file (.csv)
+    If no ExportCSVPath is specified, defaults to users temp folder. Example:
+    C:\Users\username\AppData\Local\Temp\WindowsUpdateLogExport_20241103_180323.csv
+
 .PARAMETER ExportCSVPath
     Create a .csv file based on date/time, instead of outputting. Defaults to users temp folder
 
@@ -41,7 +46,7 @@ param (
     [int]$Hours = 24, # -Hours 24 
 
     [Parameter(Mandatory=$false)]
-    [bool]$ExportCSV = $false,
+    [switch]$ExportCSV,
 
     [Parameter(Mandatory=$false)]
     $ExportCSVPath = $env:Temp,
