@@ -136,7 +136,9 @@ try {
                     $encodedSearchTerm = [System.Web.HttpUtility]::UrlEncode($searchTerm)
                     $bingSearchUrl = "https://www.bing.com/search?q=$encodedSearchTerm"
 
-                    Write-Host " ($bingSearchUrl)" -NoNewline -ForegroundColor DarkGray
+                    if ($hresult -ne "0x00000000") {
+                        Write-Host " ($bingSearchUrl)" -NoNewline -ForegroundColor DarkGray
+                    }
                 }
             }
         } else {
