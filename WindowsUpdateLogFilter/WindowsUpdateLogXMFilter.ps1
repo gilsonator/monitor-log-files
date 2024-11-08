@@ -46,10 +46,10 @@ param (
     [int]$Hours = 24, # -Hours 24 
 
     [Parameter(Mandatory=$false)]
-    [switch]$ExportCSV,
+    $ExportCSV,
 
-    [Parameter(Mandatory=$false)]
-    $ExportCSVPath = $env:Temp,
+    # [Parameter(Mandatory=$false)]
+    # $ExportCSVPath = $env:Temp,
 
     # Pause on console height
     [Parameter(Mandatory=$false)]
@@ -57,6 +57,7 @@ param (
 )
 
 if ($ExportCSV) {
+    if ($ExportCSV.Length -eq 0) { $ExportCSVPath = $env:Temp}
     # Resolve the ExportCSVPath path relative to the script's directory
     if ([System.IO.Path]::IsPathRooted($ExportCSVPath)) {
         $exportCSVPath = $ExportCSVPath
@@ -66,106 +67,133 @@ if ($ExportCSV) {
 
     $DateTime = Get-Date -Format "yyyyMMdd_HHmmss"
     $exportCSVPath += "\WindowsUpdateLogExport_$DateTime.csv"
-    
 }
 
-# Clear-Host
-# $ErrorActionPreference = "Stop"
+$title = 'Windows Update Log XML Filter'
+Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
+Clear-Host
 
-$stringBuilder = New-Object System.Text.StringBuilder
+try {
+    # $ErrorActionPreference = "Stop"
 
-# Map levels to their corresponding values
-$levelMap = @{
-    "Verbose" = 0
-    "Critical" = 1
-    "Error" = 2
-    "Warning" = 3
-    "Information" = 4
-}
+    $stringBuilder = New-Object System.Text.StringBuilder
 
-# Iterate through the EventLevels array
-foreach ($Level in $EventLevels) {
-    $stringBuilder.Append("Level=$($levelMap[$Level]) or ") | Out-Null
-}
+    # Map levels to their corresponding values
+    $levelMap = @{
+        "Verbose" = 0
+        "Critical" = 1
+        "Error" = 2
+        "Warning" = 3
+        "Information" = 4
+    }
 
-# Remove any trailing spaces, ‘o’, or ‘r’ characters from the end of the string. 
-# This is useful when you want to ensure that the exact sequence " or " is removed from the end of the string.
-$LevelsQuery = $stringBuilder.ToString().TrimEnd(" or ".ToCharArray())
+    # Iterate through the EventLevels array
+    foreach ($Level in $EventLevels) {
+        $stringBuilder.Append("Level=$($levelMap[$Level]) or ") | Out-Null
+    }
 
-Write-Debug $LevelsQuery
+    # Remove any trailing spaces, ‘o’, or ‘r’ characters from the end of the string. 
+    # This is useful when you want to ensure that the exact sequence " or " is removed from the end of the string.
+    $LevelsQuery = $stringBuilder.ToString().TrimEnd(" or ".ToCharArray())
 
-$MilliSeconds = 3600000 * $Hours # (60 * 60 * 1000)
+    Write-Debug $LevelsQuery
 
-# I know XML very well - So I decided to use the FilterXML parameter:
-$xmlQuery = @"
+    $MilliSeconds = 3600000 * $Hours # (60 * 60 * 1000)
+
+    # I know XML very well - So I decided to use the FilterXML parameter:
+    $xmlQuery = @"
 <QueryList>
-  <Query Id="0" Path="Microsoft-Windows-WindowsUpdateClient/Operational">
+<Query Id="0" Path="Microsoft-Windows-WindowsUpdateClient/Operational">
     <Select Path="Microsoft-Windows-WindowsUpdateClient/Operational">*[System[($LevelsQuery) 
         and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]</Select>
-  </Query>
+</Query>
 </QueryList>
 "@
 
-$events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
-# Another way in XML, is using the FilterXPath parameter:
-# NOTE: The timediff function works within the XML query format used by Get-WinEvent -FilterXML. 
-#       The -FilterXPath parameter has limitations and doesn’t support all XPath functions, 
-#       which is why the timediff function doesn’t work:
-# $XPath = "*[System[($LevelsQuery) and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]"
-# $events = Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' -FilterXPath $XPath
+    $events = Get-WinEvent -FilterXML $xmlQuery -ErrorAction Stop
+    # Another way in XML, is using the FilterXPath parameter:
+    # NOTE: The timediff function works within the XML query format used by Get-WinEvent -FilterXML. 
+    #       The -FilterXPath parameter has limitations and doesn’t support all XPath functions, 
+    #       which is why the timediff function doesn’t work:
+    # $XPath = "*[System[($LevelsQuery) and TimeCreated[timediff(@SystemTime) &lt;=$MilliSeconds]]]"
+    # $events = Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational' -FilterXPath $XPath
 
-if ($events.Count -eq 0) {
-    Write-Host  "No Windows Update Events ($($EventLevels -join ', '))" `
-    "returned in the past $($Hours -gt 1 ? "{0:N0} hours" -f $Hours : "hour")" -ForegroundColor Yellow
-} else {
-    if ($ExportCSV) {
-        $filteredEvents = @()
+    if ($events.Count -eq 0) {
+        Write-Host  "No Windows Update Events ($($EventLevels -join ', '))" `
+        "returned in the past $($Hours -gt 1 ? "{0:N0} hours" -f $Hours : "hour")" -ForegroundColor Yellow
     } else {
-        Write-Host "Date`t`t`tLevel`t`tMessage`t`t`t`tDetails" -ForegroundColor Blue 
-    }
-
-    $sortedEvents = $events | Sort-Object -Property TimeCreated
-
-    # Initialize the line count
-    [int]$lineCount = 0
-    
-    foreach ($event in $sortedEvents) {
         if ($ExportCSV) {
-            $filteredEvent  = [PSCustomObject]@{
-                TimeCreated = $event.TimeCreated
-                Level       = $event.LevelDisplayName
-                Message     = $event.Message
-                Data        = if ($event.Opcode -eq 12) { $event.Properties[0].Value }
-            }
-            # Add the filtered event to the array
-            $filteredEvents += $filteredEvent
-        } else { # Write to host
+            $filteredEvents = @()
+        } else {
+            Write-Host "Date`t`t`tLevel`t`tMessage`t`t`t`tDetails" -ForegroundColor Blue 
+        }
+
+        $sortedEvents = $events | Sort-Object -Property TimeCreated
+
+        # Initialize the line count
+        [int]$lineCount = 0
+        [int]$lineOuputCount = 0
+        
+        foreach ($event in $sortedEvents) {
             $lineCount++
-            $consoleHeight = $Host.UI.RawUI.WindowSize.Height
-            
-            Write-Debug $consoleHeight","$lineCount
-            Write-Host $event.TimeCreated -ForegroundColor Green -NoNewline
-            Write-Host "`t" -NoNewline
-            Write-Host $event.LevelDisplayName -ForegroundColor Yellow -NoNewline
-            Write-Host "`t" -NoNewline
-            Write-Host $event.Message -ForegroundColor White -NoNewline
-            # For downloads, show package
-            Write-Host "`t" -NoNewline
-            Write-Host ($event.Opcode -eq 12 ? $event.Properties[0].Value : "") -ForegroundColor Magenta
-            
-            if ($Pause -eq $true -and ($lineCount -gt $consoleHeight -4)) {
-                Read-Host -Prompt "Press Enter to continue..."
-                $lineCount = 0
+            $data = $event.Opcode -eq 12 ? $event.Properties[0].Value : ""
+
+            if ($ExportCSV) {
+                $filteredEvent  = [PSCustomObject]@{
+                    TimeCreated = $event.TimeCreated
+                    Level       = $event.LevelDisplayName
+                    Message     = $event.Message
+                    Data        = $data
+                }
+                # Add the filtered event to the array
+                $filteredEvents += $filteredEvent
+            } else { # Write to host
+                $lineOuputCount++
+                $consoleHeight = $Host.UI.RawUI.WindowSize.Height
+                
+                Write-Debug $consoleHeight","$lineCount
+                Write-Host $event.TimeCreated -ForegroundColor Green -NoNewline
+                Write-Host "`t" -NoNewline
+                Write-Host $event.LevelDisplayName -ForegroundColor Yellow -NoNewline
+                Write-Host "`t" -NoNewline
+                Write-Host $event.Message -ForegroundColor White -NoNewline
+                # For downloads, show package
+                Write-Host "`t" -NoNewline
+                Write-Host $data -ForegroundColor Magenta
+                
+                #  Security Intelligence Update for Microsoft Defender Antivirus - KB2267602 (Version 1.421.75.0) - Current Channel (Broad)
+                if ($data -match 'KB\d+') {
+                    $kbNumber = $matches[0]
+                    Write-Debug $kbNumber
+
+                    $searchTerm = "Windows update $kbNumber details"
+                    $encodedSearchTerm = [System.Web.HttpUtility]::UrlEncode($searchTerm)
+                    $bingSearchUrl = "https://www.bing.com/search?q=$encodedSearchTerm"
+
+                    Write-Host " ($bingSearchUrl)" -ForegroundColor DarkGray
+                }
+                
+                if ($Pause -eq $true -and ($lineOuputCount -gt $consoleHeight -4)) {
+                    Read-Host -Prompt "Press Enter to continue..."
+                    $lineOuputCount = 0
+                }
             }
         }
-    }
 
-    # Export csv..
-    if ($ExportCSV) {
-        $filteredEvents | Export-Csv -Path $exportCSVPath
-        Write-Host $events.Count "Windows Update Events ($($EventLevels -join ', ')) exported to" $exportCSVPath `
-            -ForegroundColor Yellow
+        # Export csv..
+        if ($ExportCSV) {
+            $filteredEvents | Export-Csv -Path $exportCSVPath
+            Write-Host $events.Count "Windows Update Events ($($EventLevels -join ', ')) exported to" $exportCSVPath `
+                -ForegroundColor Yellow
+        }
     }
+} catch {
+    Write-Host "An error occurred." -ForegroundColor Red
+    Write-Verbose "An error occurred: $_"
+} finally {
+    Write-Host "Script stopped. Total lines processed: $lineCount" -ForegroundColor Cyan
+    $title = '' # Reset title
+    Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
 }
 
 # DG NOTES: There are other ways to accomplish this, refer to above link:
