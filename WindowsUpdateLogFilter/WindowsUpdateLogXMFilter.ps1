@@ -173,11 +173,7 @@ try {
                     Write-Host " ($bingSearchUrl)" -ForegroundColor DarkGray
                 }
                 
-<<<<<<< HEAD
                 if ($Pause -eq $true -and ($lineOuputCount -gt $consoleHeight -4)) {
-=======
-                if ($Pause -eq $true -and ($lineCount -gt $consoleHeight -4)) {
->>>>>>> 4a3f5954c77ac80b5a9cf97ae1a0d83cbf722fd2
                     Read-Host -Prompt "Press Enter to continue..."
                     $lineOuputCount = 0
                 }
