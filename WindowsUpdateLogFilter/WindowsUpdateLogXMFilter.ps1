@@ -191,7 +191,7 @@ try {
     Write-Host "An error occurred." -ForegroundColor Red
     Write-Verbose "An error occurred: $_"
 } finally {
-    Write-Host "Script stopped. Total lines processed: $lineCount" -ForegroundColor Cyan
+    Write-Host "Total lines processed: $lineCount" -ForegroundColor Cyan
     $title = '' # Reset title
     Write-Host "$([char]0x1B)]0;$title$([char]0x7)"
 }
